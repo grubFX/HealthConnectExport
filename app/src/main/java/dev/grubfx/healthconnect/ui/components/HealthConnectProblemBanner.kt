@@ -1,4 +1,4 @@
-package xyz.angeloanan.healthconnectexports.ui.components
+package dev.grubfx.healthconnect.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

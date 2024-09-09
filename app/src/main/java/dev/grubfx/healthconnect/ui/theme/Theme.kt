@@ -1,4 +1,4 @@
-package xyz.angeloanan.healthconnectexports.ui.theme
+package dev.grubfx.healthconnect.ui.theme
 
 import android.app.Activity
 import android.os.Build

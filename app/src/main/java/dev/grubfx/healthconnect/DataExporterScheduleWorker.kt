@@ -1,4 +1,4 @@
-package xyz.angeloanan.healthconnectexports
+package dev.grubfx.healthconnect
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -9,11 +9,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.getSystemService
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.permission.HealthPermission
-import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
-import androidx.health.connect.client.records.HeartRateRecord
-import androidx.health.connect.client.records.SleepSessionRecord
-import androidx.health.connect.client.records.StepsRecord
-import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
+import androidx.health.connect.client.records.*
 import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.work.CoroutineWorker
@@ -33,12 +29,39 @@ import java.util.TimeZone
 
 val httpClient = HttpClient(Android)
 
-val requiredHealthConnectPermissions = setOf(
-    HealthPermission.getReadPermission(StepsRecord::class),
-    HealthPermission.getReadPermission(SleepSessionRecord::class),
+// a set of all readable permissions
+val readonlyHealthConnectPermissions = setOf(
     HealthPermission.getReadPermission(ActiveCaloriesBurnedRecord::class),
-    HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class),
+    HealthPermission.getReadPermission(BasalBodyTemperatureRecord::class),
+    HealthPermission.getReadPermission(BasalMetabolicRateRecord::class),
+    HealthPermission.getReadPermission(BloodGlucoseRecord::class),
+    HealthPermission.getReadPermission(BloodPressureRecord::class),
+    HealthPermission.getReadPermission(BodyFatRecord::class),
+    HealthPermission.getReadPermission(BodyTemperatureRecord::class),
+    HealthPermission.getReadPermission(BoneMassRecord::class),
+    HealthPermission.getReadPermission(CervicalMucusRecord::class),
+    HealthPermission.getReadPermission(DistanceRecord::class),
+    HealthPermission.getReadPermission(ElevationGainedRecord::class),
+    HealthPermission.getReadPermission(ExerciseSessionRecord::class),
+    HealthPermission.getReadPermission(FloorsClimbedRecord::class),
     HealthPermission.getReadPermission(HeartRateRecord::class),
+    HealthPermission.getReadPermission(HeightRecord::class),
+    HealthPermission.getReadPermission(HydrationRecord::class),
+    HealthPermission.getReadPermission(MenstruationFlowRecord::class),
+    HealthPermission.getReadPermission(NutritionRecord::class),
+    HealthPermission.getReadPermission(OvulationTestRecord::class),
+    HealthPermission.getReadPermission(OxygenSaturationRecord::class),
+    HealthPermission.getReadPermission(PowerRecord::class),
+    HealthPermission.getReadPermission(RespiratoryRateRecord::class),
+    HealthPermission.getReadPermission(RestingHeartRateRecord::class),
+    HealthPermission.getReadPermission(SexualActivityRecord::class),
+    HealthPermission.getReadPermission(SleepSessionRecord::class),
+    HealthPermission.getReadPermission(SpeedRecord::class),
+    HealthPermission.getReadPermission(StepsRecord::class),
+    HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class),
+    HealthPermission.getReadPermission(Vo2MaxRecord::class),
+    HealthPermission.getReadPermission(WeightRecord::class),
+    HealthPermission.getReadPermission(WheelchairPushesRecord::class)
 )
 
 class DataExporterScheduleWorker(
@@ -63,16 +86,14 @@ class DataExporterScheduleWorker(
 
     private fun createExceptionNotification(e: Exception): Notification {
         return NotificationCompat.Builder(applicationContext, "export")
-            .setContentTitle("Export failed")
-            .setContentText("Failed to export Health Connect data")
+            .setContentTitle("Export failed").setContentText("Failed to export Health Connect data")
             .setStyle(NotificationCompat.BigTextStyle().bigText(e.message))
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .build()
+            .setSmallIcon(R.drawable.ic_launcher_foreground).build()
     }
 
     private suspend fun isHealthConnectPermissionGranted(healthConnect: HealthConnectClient): Boolean {
         val grantedPermissions = healthConnect.permissionController.getGrantedPermissions()
-        return requiredHealthConnectPermissions.all { it in grantedPermissions }
+        return readonlyHealthConnectPermissions.all { it in grantedPermissions }
     }
 
     override suspend fun doWork(): Result {
@@ -99,8 +120,7 @@ class DataExporterScheduleWorker(
             NotificationCompat.Builder(applicationContext, notificationChannel.id)
                 .setContentTitle("Exporting data")
                 .setContentText("Exporting Health Connect data to the cloud")
-                .setSmallIcon(R.drawable.ic_launcher_foreground).setOngoing(true)
-                .build()
+                .setSmallIcon(R.drawable.ic_launcher_foreground).setOngoing(true).build()
 
         notificationManager.notify(1, foregroundNotification)
 
@@ -126,6 +146,7 @@ class DataExporterScheduleWorker(
         }
         Log.d("DataExporterWorker", "Raw data: ${Gson().toJson(healthDataAggregate)}")
 
+        // build a JSON file from the aggregate data
         val jsonValues = HashMap<String, Number>()
         jsonValues["steps"] = healthDataAggregate[StepsRecord.COUNT_TOTAL] ?: 0
         jsonValues["active_calories"] =
@@ -135,6 +156,8 @@ class DataExporterScheduleWorker(
             healthDataAggregate[TotalCaloriesBurnedRecord.ENERGY_TOTAL]?.inKilocalories ?: 0
         jsonValues["sleep_duration_seconds"] =
             healthDataAggregate[SleepSessionRecord.SLEEP_DURATION_TOTAL]?.seconds ?: 0
+        //TODO add the rest of the newly added fields for export
+
         val json = Gson().toJson(mapOf("time" to startOfDay.toEpochMilli(), "data" to jsonValues))
         Log.d("DataExporterWorker", "Data: $json")
 

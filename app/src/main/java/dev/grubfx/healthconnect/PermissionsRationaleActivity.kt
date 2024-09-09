@@ -1,4 +1,4 @@
-package xyz.angeloanan.healthconnectexports
+package dev.grubfx.healthconnect
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,7 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import xyz.angeloanan.healthconnectexports.ui.theme.HealthConnectExportsTheme
+import dev.grubfx.healthconnect.ui.theme.HealthConnectExportsTheme
 
 class PermissionsRationaleActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,10 +19,8 @@ class PermissionsRationaleActivity : ComponentActivity() {
             HealthConnectExportsTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                }
+                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
+                ) {}
             }
         }
     }
@@ -31,8 +29,7 @@ class PermissionsRationaleActivity : ComponentActivity() {
 @Composable
 fun Greeting2(name: String, modifier: Modifier = Modifier) {
     Text(
-        text = "Hello $name!",
-        modifier = modifier
+        text = "Hello $name!", modifier = modifier
     )
 }
 

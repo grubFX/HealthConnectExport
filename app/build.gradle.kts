@@ -4,15 +4,15 @@ plugins {
 }
 
 android {
-    namespace = "xyz.angeloanan.healthconnectexports"
+    namespace = "dev.grubfx.healthconnect"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "xyz.angeloanan.healthconnectexports"
-        minSdk = 34
-        targetSdk = 34
+        applicationId = "$namespace.export"
+        minSdk = 33
+        targetSdk = 35
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -30,11 +30,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
@@ -47,18 +47,20 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    buildToolsVersion = "35.0.0"
+    dependenciesInfo {
+        includeInApk = true
+        includeInBundle = true
+    }
 }
 
 dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-    val work_version = "2.9.0"
-    val ktor_version = "2.3.9"
-
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.6.0")
-    implementation("androidx.work:work-runtime-ktx:$work_version")
-    implementation("androidx.health.connect:connect-client:1.1.0-alpha07")
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
-    implementation("com.google.code.gson:gson:2.10.1")
+    implementation(libs.kotlinx.coroutines.guava)
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.connect.client)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.gson)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -67,8 +69,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation("io.ktor:ktor-client-core:$ktor_version")
-    implementation("io.ktor:ktor-client-android:$ktor_version")
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

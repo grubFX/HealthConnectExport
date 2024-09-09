@@ -1,4 +1,4 @@
-package xyz.angeloanan.healthconnectexports
+package dev.grubfx.healthconnect
 
 import android.content.Context
 import android.os.Bundle
@@ -48,10 +48,10 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import xyz.angeloanan.healthconnectexports.ui.components.HealthConnectProblemsBanner
-import xyz.angeloanan.healthconnectexports.ui.theme.HealthConnectExportsTheme
-import xyz.angeloanan.healthconnectexports.ui.viewmodels.ExporterBackgroundWorkViewModel
-import xyz.angeloanan.healthconnectexports.ui.viewmodels.WORK_NAME_ONCE
+import dev.grubfx.healthconnect.ui.theme.HealthConnectExportsTheme
+import dev.grubfx.healthconnect.ui.viewmodels.ExporterBackgroundWorkViewModel
+import dev.grubfx.healthconnect.ui.viewmodels.WORK_NAME_ONCE
+import dev.grubfx.healthconnect.ui.components.HealthConnectProblemsBanner
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 val EXPORT_DESTINATION_URI = stringPreferencesKey("export_destination_uri")
@@ -175,15 +175,13 @@ fun RunDataExportButton() {
     val context = LocalContext.current
     val workManager = WorkManager.getInstance(context)
 
-    Button(
-        onClick = {
-            workManager.enqueueUniqueWork(
-                WORK_NAME_ONCE,
-                androidx.work.ExistingWorkPolicy.REPLACE,
-                OneTimeWorkRequest.from(DataExporterScheduleWorker::class.java)
-            )
-        }
-    ) {
+    Button(onClick = {
+        workManager.enqueueUniqueWork(
+            WORK_NAME_ONCE,
+            androidx.work.ExistingWorkPolicy.REPLACE,
+            OneTimeWorkRequest.from(DataExporterScheduleWorker::class.java)
+        )
+    }) {
         Text(text = "Run Data Export")
     }
 }
@@ -218,8 +216,7 @@ fun RequestPermissionButton() {
 fun RequestHealthConnectPermissionButton() {
     var isButtonEnabled = true
 
-    val context = LocalContext.current
-    val healthConnect = HealthConnectClient.getOrCreate(context)
+    HealthConnectClient.getOrCreate(LocalContext.current)
     val permissionLauncher =
         rememberLauncherForActivityResult(PermissionController.createRequestPermissionResultContract()) { granted ->
             Log.d("MainActivity", "Health Connect granted permissions: $granted")
@@ -228,7 +225,7 @@ fun RequestHealthConnectPermissionButton() {
     Button(
         enabled = isButtonEnabled,
         onClick = {
-            permissionLauncher.launch(requiredHealthConnectPermissions)
+            permissionLauncher.launch(readonlyHealthConnectPermissions)
         },
     ) {
         Text(text = "Health Connect Permission")

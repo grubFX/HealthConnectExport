@@ -1,4 +1,4 @@
-package xyz.angeloanan.healthconnectexports.ui.theme
+package dev.grubfx.healthconnect.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
